@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crop Recommendation System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Crop Recommendation System</h1>
+
+    <div class="form">
+
+        <!-- Soil Inputs -->
+        <div class="row">
+
+            <div class="field">
+                <label for="nitrogen">Nitrogen</label>
+                <input type="number" id="nitrogen" placeholder="Enter Nitrogen">
+            </div>
+
+            <div class="field">
+                <label for="phosphorus">Phosphorus</label>
+                <input type="number" id="phosphorus" placeholder="Enter Phosphorus">
+            </div>
+
+            <div class="field">
+                <label for="potassium">Potassium</label>
+                <input type="number" id="potassium" placeholder="Enter Potassium">
+            </div>
+
+            <div class="field">
+                <label for="ph">pH</label>
+                <input type="number" id="ph" placeholder="Enter pH">
+            </div>
+
+        </div>
+
+        <!-- Sensor Inputs -->
+        <div class="row">
+
+            <div class="field">
+                <label for="temperature">Temperature (Sensor)</label>
+                <input type="text" id="temperature" readonly>
+            </div>
+
+            <div class="field">
+                <label for="humidity">Humidity (Sensor)</label>
+                <input type="text" id="humidity" readonly>
+            </div>
+
+            <div class="field">
+                <label for="moisture">Soil Moisture (Sensor)</label>
+                <input type="text" id="moisture" readonly>
+            </div>
+
+        </div>
+
+        <!-- Weather Input -->
+        <div class="row">
+            <div class="field">
+                <label for="rainfall">Rainfall (API)</label>
+                <input type="text" id="rainfall" readonly>
+            </div>
+        </div>
+
+        <!-- Button -->
+        <button id="recommendBtn" type="button" onclick="getRecommendation()">Get Recommendation</button>
+
+        <!-- Result -->
+        <div class="result" id="result">
+            <h3>Recommended Crop:</h3>
+            <p id="cropOutput">---</p>
+        </div>
+
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
+
+
+
