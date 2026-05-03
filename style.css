@@ -104,10 +104,38 @@ button:hover {
 /* Result Heading */
 .result h3 {
     margin-bottom: 10px;
+    
 }
 
 /* Crop Output */
 #cropOutput {
     font-size: 18px;
     font-weight: bold;
+}
+
+.result-box {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.result-item {
+    width: 50%;
+    text-align: center;
+}
+
+.result-item:first-child {
+    border-right: 2px solid white;
+}
+
+.result-item h4 {
+    margin-bottom: 8px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.result-item p {
+    font-size: 18px;
+    font-weight: bold;
+    color: yellow;
 }

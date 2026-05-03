@@ -17,7 +17,7 @@ async function getSensorData() {
 // ---------------- WEATHER API (RAINFALL ONLY) ----------------
 async function getWeatherData() {
     try {
-        const apiKey = "YOUR_API_KEY";
+        const apiKey = "zpka_cbe15254016941db9f888a124a4678c0_6dd62cff";
 
         const locRes = await fetch(
             `https://dataservice.accuweather.com/locations/v1/cities/search?apikey=${apiKey}&q=Dhule`
@@ -55,7 +55,6 @@ window.onload = () => {
     setInterval(loadRealTimeData, 5000); // refresh every 5 sec
 };
 
-
 function getRecommendation() {
 
     const output = document.getElementById("cropOutput");
@@ -70,42 +69,32 @@ function getRecommendation() {
     let moisture = document.getElementById("moisture").value;
     let rainfall = document.getElementById("rainfall").value;
 
-    // ---------------- STEP 1: EMPTY CHECK ----------------
+    // Validation
     if (!N || !P || !K || !H) {
         output.innerText = "⚠️ Please enter N, P, K and pH values.";
         return;
     }
 
-    // ---------------- STEP 2: CONVERT ----------------
     N = parseFloat(N);
     P = parseFloat(P);
     K = parseFloat(K);
     H = parseFloat(H);
 
-    // ---------------- STEP 3: INVALID / NONSENSE CHECK ----------------
     if ([N, P, K, H].some(v => isNaN(v))) {
         output.innerText = "⚠️ Invalid input values.";
         return;
     }
 
-    // 🔥 STRICT RANGE CHECK (THIS FIXES YOUR ISSUE)
-    if (
-        N < 0 || N > 200 ||
-        P < 0 || P > 200 ||
-        K < 0 || K > 200 ||
-        H < 0 || H > 14
-    ) {
-        output.innerText = "⚠️ Enter realistic NPK and pH values.";
+    if (N < 0 || N > 200 || P < 0 || P > 200 || K < 0 || K > 200 || H < 0 || H > 14) {
+        output.innerText = "⚠️ Enter realistic values.";
         return;
     }
 
-    // ---------------- STEP 4: SENSOR CHECK ----------------
     if (!temp || !humidity || !moisture) {
-        output.innerText = "📡 Sensor data loading... Please wait.";
+        output.innerText = "📡 Sensor data loading...";
         return;
     }
 
-    // ---------------- STEP 5: CONVERT SENSOR ----------------
     temp = parseFloat(temp);
     humidity = parseFloat(humidity);
     moisture = parseFloat(moisture);
@@ -116,24 +105,141 @@ function getRecommendation() {
         return;
     }
 
-    // ---------------- STEP 6: LOGIC ----------------
-    let crop = "";
-
-    if (N > 80 && P > 30 && K > 30 && temp > 25 && humidity > 40 && rainfall > 50) {
-        crop = "Rice 🌾";
-    } 
-    else if (N > 60 && P > 30 && temp < 25 && moisture < 40) {
-        crop = "Wheat 🌿";
-    } 
-    else if (N > 90 && temp > 25 && rainfall < 80) {
-        crop = "Maize 🌽";
-    } 
-    else if (K > 80 && moisture > 60) {
-        crop = "Potato 🥔";
-    } 
-    else {
-        crop = "Cotton 🌼";
-    }
-
-    output.innerText = crop;
+    // ✅ CALL ML HERE
+    callML(N, P, K, H, temp, humidity, rainfall, moisture);
 }
+
+
+// ✅ OUTSIDE FUNCTION
+async function callML(N, P, K, H, temp, humidity, rainfall, moisture) {
+    try {
+        const res = await fetch("http://localhost:5000/predict", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                N, P, K,
+                ph: H,
+                temperature: temp,
+                humidity,
+                rainfall,
+                soil: moisture
+            })
+        });
+
+        const result = await res.json();
+
+        document.getElementById("cropOutput").innerText = result.crop;
+        document.getElementById("qualityOutput").innerText = result.quality;
+
+    } catch (error) {
+        console.error("ML Error:", error);
+        document.getElementById("cropOutput").innerText = "Error";
+        document.getElementById("qualityOutput").innerText = "--";
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+// function getRecommendation() {
+
+//     const output = document.getElementById("cropOutput");
+
+//     let N = document.getElementById("nitrogen").value;
+//     let P = document.getElementById("phosphorus").value;
+//     let K = document.getElementById("potassium").value;
+//     let H = document.getElementById("ph").value;
+
+//     let temp = document.getElementById("temperature").value;
+//     let humidity = document.getElementById("humidity").value;
+//     let moisture = document.getElementById("moisture").value;
+//     let rainfall = document.getElementById("rainfall").value;
+
+//     // ---------------- STEP 1: EMPTY CHECK ----------------
+//     if (!N || !P || !K || !H) {
+//         output.innerText = "⚠️ Please enter N, P, K and pH values.";
+//         return;
+//     }
+
+//     // ---------------- STEP 2: CONVERT ----------------
+//     N = parseFloat(N);
+//     P = parseFloat(P);
+//     K = parseFloat(K);
+//     H = parseFloat(H);
+
+//     // ---------------- STEP 3: INVALID / NONSENSE CHECK ----------------
+//     if ([N, P, K, H].some(v => isNaN(v))) {
+//         output.innerText = "⚠️ Invalid input values.";
+//         return;
+//     }
+
+//     // 🔥 STRICT RANGE CHECK (THIS FIXES YOUR ISSUE)
+//     if (
+//         N < 0 || N > 200 ||
+//         P < 0 || P > 200 ||
+//         K < 0 || K > 200 ||
+//         H < 0 || H > 14
+//     ) {
+//         output.innerText = "⚠️ Enter realistic NPK and pH values.";
+//         return;
+//     }
+
+//     // ---------------- STEP 4: SENSOR CHECK ----------------
+//     if (!temp || !humidity || !moisture) {
+//         output.innerText = "📡 Sensor data loading... Please wait.";
+//         return;
+//     }
+
+//     // ---------------- STEP 5: CONVERT SENSOR ----------------
+//     temp = parseFloat(temp);
+//     humidity = parseFloat(humidity);
+//     moisture = parseFloat(moisture);
+//     rainfall = parseFloat(rainfall);
+
+//     if ([temp, humidity, moisture].some(v => isNaN(v))) {
+//         output.innerText = "⚠️ Invalid sensor data.";
+//         return;
+//     }
+
+// async function callML(N, P, K, H, temp, humidity, rainfall, moisture) {
+//     try {
+//         const res = await fetch("http://localhost:5000/predict", {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/json"
+//             },
+//             body: JSON.stringify({
+//                 N: N,
+//                 P: P,
+//                 K: K,
+//                 ph: H,
+//                 temperature: temp,
+//                 humidity: humidity,
+//                 rainfall: rainfall,
+//                 soil: moisture
+//             })
+//         });
+
+//         const result = await res.json();
+
+//         document.getElementById("cropOutput").innerText = result.crop;
+//         document.getElementById("qualityOutput").innerText = result.quality;
+
+//     } catch (error) {
+//         console.error("ML Error:", error);
+//         document.getElementById("cropOutput").innerText = "Error";
+//         document.getElementById("qualityOutput").innerText = "--";
+//     }
+//     console.log("Calling ML...");
+// }
+// callML(N, P, K, H, temp, humidity, rainfall, moisture);
+// }
